@@ -41,11 +41,11 @@ export function StudentDetail() {
         {student.goal ? ` · ${student.goal}` : ''}
       </p>
 
-      <div className="row" style={{ marginBottom: 16 }}>
+      <div className="tabs">
         {(['treinos', 'evolucao', 'agenda', 'pagamentos'] as const).map((t) => (
           <button
             key={t}
-            className={tab === t ? '' : 'ghost'}
+            className={tab === t ? 'active' : ''}
             onClick={() => setTab(t)}
           >
             {t === 'treinos' && 'Treinos'}
