@@ -112,3 +112,71 @@ workoutsRouter.delete('/:id', async (req, res) => {
   await prisma.workout.delete({ where: { id: workout.id } });
   res.status(204).end();
 });
+
+// --- Check-ins (registro de execução do treino pelo aluno) ---
+
+// Confere se o usuário pode acessar o treino e devolve o treino com o studentId.
+async function workoutForUser(workoutId: string, user: { userId: string; role: string }) {
+  const workout = await prisma.workout.findUnique({
+    where: { id: workoutId },
+    include: { exercises: { orderBy: { order: 'asc' } } },
+  });
+  if (!workout) return null;
+  if (user.role === 'STUDENT') {
+    const studentId = await studentProfileId(user.userId);
+    return workout.studentId === studentId ? workout : null;
+  }
+  const trainerId = await trainerProfileId(user.userId);
+  if (!(await studentBelongsToTrainer(workout.studentId, trainerId!))) return null;
+  return workout;
+}
+
+// Histórico de check-ins de um treino.
+workoutsRouter.get('/:id/logs', async (req, res) => {
+  const workout = await workoutForUser(req.params.id, req.user!);
+  if (!workout) return res.status(404).json({ error: 'Treino não encontrado.' });
+  const logs = await prisma.workoutLog.findMany({
+    where: { workoutId: workout.id },
+    include: { entries: { orderBy: { order: 'asc' } } },
+    orderBy: { date: 'desc' },
+  });
+  res.json(logs);
+});
+
+const logEntrySchema = z.object({
+  exerciseName: z.string().min(1),
+  setsDone: z.number().int().nonnegative().optional(),
+  repsDone: z.string().optional(),
+  weightKg: z.number().nonnegative().optional(),
+  done: z.boolean().default(true),
+  order: z.number().int().nonnegative().default(0),
+});
+
+const createLogSchema = z.object({
+  date: z.string().datetime().optional(),
+  notes: z.string().optional(),
+  entries: z.array(logEntrySchema).default([]),
+});
+
+// Aluno registra um check-in (treino feito + cargas executadas).
+workoutsRouter.post('/:id/logs', validateBody(createLogSchema), async (req, res) => {
+  if (req.user!.role !== 'STUDENT') {
+    return res.status(403).json({ error: 'Apenas o aluno faz check-in do treino.' });
+  }
+  const workout = await workoutForUser(req.params.id, req.user!);
+  if (!workout) return res.status(404).json({ error: 'Treino não encontrado.' });
+  const studentId = await studentProfileId(req.user!.userId);
+  const data = req.body as z.infer<typeof createLogSchema>;
+
+  const log = await prisma.workoutLog.create({
+    data: {
+      workoutId: workout.id,
+      studentId: studentId!,
+      date: data.date ? new Date(data.date) : undefined,
+      notes: data.notes,
+      entries: { create: data.entries },
+    },
+    include: { entries: { orderBy: { order: 'asc' } } },
+  });
+  res.status(201).json(log);
+});

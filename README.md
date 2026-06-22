@@ -20,10 +20,16 @@ trainpro/
 
 ## Funcionalidades (v1)
 
-1. **Cadastro de alunos e personal** — autenticação, perfis e vínculo personal↔aluno.
+1. **Vínculo personal↔aluno** — cada personal tem um **código de convite**. O aluno se
+   cadastra informando o código (ou usa "Vincular" depois), ou o personal conecta um aluno
+   já existente pelo e-mail. O personal também pode criar a conta do aluno direto.
 2. **Montagem de treinos** — fichas com exercícios, séries, repetições, cargas e descanso.
-3. **Acompanhamento de evolução** — peso, % de gordura, medidas e notas ao longo do tempo.
-4. **Agenda e pagamentos** — agendamento de sessões e controle de mensalidades.
+3. **Check-in de treino** — o aluno registra o treino que fez, marcando os exercícios e
+   informando as **cargas/repetições reais** de cada dia; o personal vê o histórico.
+4. **Dieta** — o personal monta um plano alimentar (refeições, horários, alimentos) que o
+   aluno visualiza no app.
+5. **Acompanhamento de evolução** — peso, % de gordura, medidas e notas ao longo do tempo.
+6. **Agenda e pagamentos** — agendamento de sessões e controle de mensalidades.
 
 ## Como rodar localmente
 
@@ -46,6 +52,8 @@ npm run dev
 ```
 
 Usuários de exemplo (após o seed): `personal@trainpro.dev` e `ana@trainpro.dev`, senha `123456`.
+O personal de exemplo tem o código de convite **`CARLOS`** (use-o ao cadastrar um novo aluno
+para já entrar vinculado).
 
 ## Deploy no Railway (web + backend num único serviço)
 

@@ -29,14 +29,17 @@ model User {
 }
 
 model TrainerProfile {
-  id     String  @id @default(cuid())
-  userId String  @unique
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bio    String?
+  id         String  @id @default(cuid())
+  userId     String  @unique
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio        String?
+  // Código curto que o personal compartilha para o aluno se vincular.
+  inviteCode String? @unique
 
   students     StudentProfile[]
   workouts     Workout[]
   appointments Appointment[]
+  dietPlans    DietPlan[]
 }
 
 model StudentProfile {
@@ -54,6 +57,8 @@ model StudentProfile {
   progress     ProgressEntry[]
   appointments Appointment[]
   payments     Payment[]
+  workoutLogs  WorkoutLog[]
+  dietPlans    DietPlan[]
 }
 
 model Workout {
@@ -70,6 +75,7 @@ model Workout {
   trainer   TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: SetNull)
 
   exercises WorkoutExercise[]
+  logs      WorkoutLog[]
 }
 
 model WorkoutExercise {
@@ -124,4 +130,62 @@ model Payment {
 
   studentId String
   student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+// Check-in: registro de uma sessão de treino executada pelo aluno,
+// com as cargas/repetições que ele realmente fez em cada exercício.
+model WorkoutLog {
+  id        String   @id @default(cuid())
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+
+  workoutId String
+  workout   Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  entries WorkoutLogEntry[]
+}
+
+model WorkoutLogEntry {
+  id           String  @id @default(cuid())
+  exerciseName String
+  setsDone     Int?
+  repsDone     String?
+  weightKg     Float?
+  done         Boolean @default(true)
+  order        Int     @default(0)
+
+  logId String
+  log   WorkoutLog @relation(fields: [logId], references: [id], onDelete: Cascade)
+}
+
+// Plano alimentar montado pelo personal para o aluno.
+model DietPlan {
+  id        String   @id @default(cuid())
+  name      String
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  trainerId String?
+  trainer   TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+
+  meals Meal[]
+}
+
+model Meal {
+  id          String  @id @default(cuid())
+  name        String  // ex.: "Café da manhã"
+  time        String? // ex.: "08:00"
+  description String  // alimentos / quantidades
+  order       Int     @default(0)
+
+  dietPlanId String
+  dietPlan   DietPlan @relation(fields: [dietPlanId], references: [id], onDelete: Cascade)
 }

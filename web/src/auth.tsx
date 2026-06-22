@@ -11,8 +11,11 @@ interface AuthState {
     email: string;
     password: string;
     role: Role;
+    inviteCode?: string;
   }) => Promise<void>;
   logout: () => void;
+  // Recarrega os dados do usuário (ex.: após vincular a um personal).
+  refresh: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -40,9 +43,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
   }
 
-  async function register(data: { name: string; email: string; password: string; role: Role }) {
+  async function register(data: {
+    name: string;
+    email: string;
+    password: string;
+    role: Role;
+    inviteCode?: string;
+  }) {
     const res = await api.post<{ token: string; user: User }>('/auth/register', data);
     setToken(res.token);
+    setUser(res.user);
+  }
+
+  async function refresh() {
+    const res = await api.get<{ user: User }>('/auth/me');
     setUser(res.user);
   }
 
@@ -52,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refresh }}>
       {children}
     </AuthContext.Provider>
   );

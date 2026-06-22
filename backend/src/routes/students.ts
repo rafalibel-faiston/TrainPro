@@ -4,11 +4,43 @@ import { z } from 'zod';
 import { prisma } from '../prisma.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { validateBody } from '../middleware/validate.js';
-import { trainerProfileId, studentBelongsToTrainer } from '../lib/profiles.js';
+import { trainerProfileId, studentBelongsToTrainer, ensureInviteCode } from '../lib/profiles.js';
 
 export const studentsRouter = Router();
 
 studentsRouter.use(authenticate, requireRole('TRAINER'));
+
+// Código de convite do personal (cria se ainda não existir).
+studentsRouter.get('/invite-code', async (req, res) => {
+  const trainerId = await trainerProfileId(req.user!.userId);
+  const code = await ensureInviteCode(trainerId!);
+  res.json({ code });
+});
+
+// Vincula um aluno já cadastrado (que ainda não tem personal) pelo e-mail.
+const connectSchema = z.object({ email: z.string().email() });
+studentsRouter.post('/connect', validateBody(connectSchema), async (req, res) => {
+  const trainerId = await trainerProfileId(req.user!.userId);
+  const { email } = req.body as z.infer<typeof connectSchema>;
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { studentProfile: true },
+  });
+  if (!user || user.role !== 'STUDENT' || !user.studentProfile) {
+    return res.status(404).json({ error: 'Nenhum aluno encontrado com esse e-mail.' });
+  }
+  if (user.studentProfile.trainerId && user.studentProfile.trainerId !== trainerId) {
+    return res.status(409).json({ error: 'Este aluno já está vinculado a outro personal.' });
+  }
+
+  const updated = await prisma.studentProfile.update({
+    where: { id: user.studentProfile.id },
+    data: { trainerId },
+    include: { user: { select: { id: true, name: true, email: true, phone: true } } },
+  });
+  res.status(200).json(serializeStudent(updated));
+});
 
 // Lista os alunos vinculados ao personal autenticado.
 studentsRouter.get('/', async (req, res) => {
@@ -75,10 +107,15 @@ studentsRouter.get('/:id', async (req, res) => {
     where: { id: req.params.id },
     include: {
       user: { select: { id: true, name: true, email: true, phone: true } },
-      workouts: { include: { exercises: true } },
+      workouts: { include: { exercises: { orderBy: { order: 'asc' } } } },
       progress: { orderBy: { date: 'desc' } },
       appointments: { orderBy: { startsAt: 'desc' } },
       payments: { orderBy: { dueDate: 'desc' } },
+      workoutLogs: {
+        include: { entries: { orderBy: { order: 'asc' } }, workout: { select: { name: true } } },
+        orderBy: { date: 'desc' },
+      },
+      dietPlans: { include: { meals: { orderBy: { order: 'asc' } } }, orderBy: { createdAt: 'desc' } },
     },
   });
   res.json(student);

@@ -6,6 +6,8 @@ export interface User {
   email: string;
   role: Role;
   phone?: string | null;
+  // Apenas para alunos: personal vinculado (null se ainda não vinculado).
+  trainer?: { id: string; name: string } | null;
 }
 
 export interface Student {
@@ -63,4 +65,39 @@ export interface Payment {
   status: 'PENDING' | 'PAID' | 'OVERDUE';
   notes?: string | null;
   student?: { user: { name: string } };
+}
+
+export interface WorkoutLogEntry {
+  id: string;
+  exerciseName: string;
+  setsDone?: number | null;
+  repsDone?: string | null;
+  weightKg?: number | null;
+  done: boolean;
+  order: number;
+}
+
+export interface WorkoutLog {
+  id: string;
+  date: string;
+  notes?: string | null;
+  workoutId: string;
+  workout?: { name: string };
+  entries: WorkoutLogEntry[];
+}
+
+export interface Meal {
+  id: string;
+  name: string;
+  time?: string | null;
+  description: string;
+  order: number;
+}
+
+export interface DietPlan {
+  id: string;
+  name: string;
+  notes?: string | null;
+  createdAt: string;
+  meals: Meal[];
 }

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../api';
-import type { Appointment, Payment, ProgressEntry, Workout } from '../types';
+import type { Appointment, DietPlan, Payment, ProgressEntry, Workout, WorkoutLog } from '../types';
 import { WorkoutForm } from '../components/WorkoutForm';
+import { DietForm } from '../components/DietForm';
 
 interface StudentFull {
   id: string;
@@ -12,12 +13,24 @@ interface StudentFull {
   progress: ProgressEntry[];
   appointments: Appointment[];
   payments: Payment[];
+  workoutLogs: WorkoutLog[];
+  dietPlans: DietPlan[];
 }
+
+type Tab = 'treinos' | 'checkins' | 'dieta' | 'evolucao' | 'agenda' | 'pagamentos';
+const TAB_LABELS: Record<Tab, string> = {
+  treinos: 'Treinos',
+  checkins: 'Check-ins',
+  dieta: 'Dieta',
+  evolucao: 'Evolução',
+  agenda: 'Agenda',
+  pagamentos: 'Pagamentos',
+};
 
 export function StudentDetail() {
   const { id } = useParams<{ id: string }>();
   const [student, setStudent] = useState<StudentFull | null>(null);
-  const [tab, setTab] = useState<'treinos' | 'evolucao' | 'agenda' | 'pagamentos'>('treinos');
+  const [tab, setTab] = useState<Tab>('treinos');
 
   async function load() {
     setStudent(await api.get<StudentFull>(`/students/${id}`));
@@ -42,16 +55,9 @@ export function StudentDetail() {
       </p>
 
       <div className="tabs">
-        {(['treinos', 'evolucao', 'agenda', 'pagamentos'] as const).map((t) => (
-          <button
-            key={t}
-            className={tab === t ? 'active' : ''}
-            onClick={() => setTab(t)}
-          >
-            {t === 'treinos' && 'Treinos'}
-            {t === 'evolucao' && 'Evolução'}
-            {t === 'agenda' && 'Agenda'}
-            {t === 'pagamentos' && 'Pagamentos'}
+        {(['treinos', 'checkins', 'dieta', 'evolucao', 'agenda', 'pagamentos'] as const).map((t) => (
+          <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
+            {TAB_LABELS[t]}
           </button>
         ))}
       </div>
@@ -89,6 +95,10 @@ export function StudentDetail() {
         </>
       )}
 
+      {tab === 'checkins' && <CheckinsTab logs={student.workoutLogs} />}
+      {tab === 'dieta' && (
+        <DietTab studentId={student.id} plans={student.dietPlans} onChange={load} />
+      )}
       {tab === 'evolucao' && (
         <ProgressTab studentId={student.id} entries={student.progress} onChange={load} />
       )}
@@ -99,6 +109,87 @@ export function StudentDetail() {
         <PaymentsTab studentId={student.id} items={student.payments} onChange={load} />
       )}
     </div>
+  );
+}
+
+function CheckinsTab({ logs }: { logs: WorkoutLog[] }) {
+  if (logs.length === 0) {
+    return <p className="muted">O aluno ainda não registrou nenhum check-in.</p>;
+  }
+  return (
+    <>
+      {logs.map((log) => (
+        <div className="card" key={log.id}>
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <strong>{log.workout?.name ?? 'Treino'}</strong>
+            <span className="muted">{new Date(log.date).toLocaleString('pt-BR')}</span>
+          </div>
+          {log.notes && <p className="muted">{log.notes}</p>}
+          <table>
+            <thead>
+              <tr>
+                <th>Exercício</th>
+                <th>Séries</th>
+                <th>Reps</th>
+                <th>Carga</th>
+              </tr>
+            </thead>
+            <tbody>
+              {log.entries.map((e) => (
+                <tr key={e.id}>
+                  <td>{e.done ? e.exerciseName : <s className="muted">{e.exerciseName}</s>}</td>
+                  <td>{e.setsDone ?? '—'}</td>
+                  <td>{e.repsDone ?? '—'}</td>
+                  <td>{e.weightKg != null ? `${e.weightKg} kg` : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function DietTab({
+  studentId,
+  plans,
+  onChange,
+}: {
+  studentId: string;
+  plans: DietPlan[];
+  onChange: () => void;
+}) {
+  async function remove(id: string) {
+    await api.del(`/diets/${id}`);
+    onChange();
+  }
+
+  return (
+    <>
+      <DietForm studentId={studentId} onCreated={onChange} />
+      {plans.map((plan) => (
+        <div className="card" key={plan.id}>
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <strong>{plan.name}</strong>
+            <button className="ghost" onClick={() => remove(plan.id)}>
+              Remover
+            </button>
+          </div>
+          {plan.notes && <p className="muted">{plan.notes}</p>}
+          {plan.meals.map((m) => (
+            <div key={m.id} style={{ padding: '8px 0', borderTop: '1px solid var(--border)' }}>
+              <strong>
+                {m.time ? `${m.time} · ` : ''}
+                {m.name}
+              </strong>
+              <div className="muted">{m.description}</div>
+            </div>
+          ))}
+        </div>
+      ))}
+      {plans.length === 0 && <p className="muted">Nenhum plano alimentar ainda.</p>}
+    </>
   );
 }
 

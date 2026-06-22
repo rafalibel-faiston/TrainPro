@@ -10,6 +10,7 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>('TRAINER');
+  const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -21,7 +22,13 @@ export function LoginPage() {
       if (mode === 'login') {
         await login(email, password);
       } else {
-        await register({ name, email, password, role });
+        await register({
+          name,
+          email,
+          password,
+          role,
+          inviteCode: role === 'STUDENT' && inviteCode.trim() ? inviteCode.trim() : undefined,
+        });
       }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Falha ao autenticar.');
@@ -47,6 +54,17 @@ export function LoginPage() {
               <option value="TRAINER">Personal trainer</option>
               <option value="STUDENT">Aluno</option>
             </select>
+            {role === 'STUDENT' && (
+              <>
+                <label>Código do personal (opcional)</label>
+                <input
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                  placeholder="Ex.: CARLOS"
+                  maxLength={12}
+                />
+              </>
+            )}
           </>
         )}
 
