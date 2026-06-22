@@ -5,4 +5,4 @@
 // - Emulador Android: 'http://10.0.2.2:4000'
 //
 // Troque o valor abaixo pela URL do seu backend e reinicie o `npx expo start`.
-export const API_URL = 'http://localhost:4000';
+export const API_URL = 'https://trainprobackend-production.up.railway.app';
