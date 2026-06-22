@@ -1,0 +1,19 @@
+node_modules/
+dist/
+build/
+.env
+*.log
+
+# Prisma / SQLite
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+*.sqlite
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Expo
+.expo/
+web-build/
