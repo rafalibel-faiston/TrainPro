@@ -1,0 +1,16 @@
+# Postgres para desenvolvimento local. Suba com: docker compose up -d
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: trainpro
+      POSTGRES_PASSWORD: trainpro
+      POSTGRES_DB: trainpro
+    ports:
+      - '5432:5432'
+    volumes:
+      - trainpro_pgdata:/var/lib/postgresql/data
+
+volumes:
+  trainpro_pgdata:

@@ -4,10 +4,9 @@ build/
 .env
 *.log
 
-# Prisma / SQLite
-backend/prisma/dev.db
-backend/prisma/dev.db-journal
+# Prisma local
 *.sqlite
+*.db
 
 # Editor / OS
 .DS_Store
