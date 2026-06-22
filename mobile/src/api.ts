@@ -1,11 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
-
-// Endereço da API. Em emulador Android use http://10.0.2.2:4000;
-// em dispositivo físico, o IP da máquina que roda o backend.
-const API_URL =
-  (Constants.expoConfig?.extra as { apiUrl?: string } | undefined)?.apiUrl ??
-  'http://localhost:4000';
+import { API_URL } from './config';
 
 const TOKEN_KEY = 'trainpro_token';
 
