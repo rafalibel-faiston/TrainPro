@@ -1,0 +1,11 @@
+# Configuração de build do Railway/Nixpacks para o serviço único (backend + web).
+# Usamos `npm install` (e não o `npm ci` padrão) por ser um monorepo com workspaces.
+
+[phases.install]
+cmds = ['npm install']
+
+[phases.build]
+cmds = ['npm run build']
+
+[start]
+cmd = 'npm start'
