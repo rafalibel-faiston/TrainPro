@@ -26,6 +26,10 @@ export function WorkoutForm({
     setExercises((prev) => prev.map((ex, idx) => (idx === i ? { ...ex, ...patch } : ex)));
   }
 
+  function removeExercise(i: number) {
+    setExercises((prev) => prev.filter((_, idx) => idx !== i));
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     await api.post('/workouts', {
@@ -51,60 +55,125 @@ export function WorkoutForm({
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} style={{ marginBottom: 16 }}>
-        + Novo treino
-      </button>
+      <div style={{ marginBottom: 16 }}>
+        <button onClick={() => setOpen(true)}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Novo treino
+        </button>
+      </div>
     );
   }
 
   return (
-    <form className="card" onSubmit={submit}>
-      <label>Nome do treino</label>
-      <input value={name} onChange={(e) => setName(e.target.value)} required placeholder="Treino A" />
-      <label>Observações</label>
-      <input value={notes} onChange={(e) => setNotes(e.target.value)} />
+    <form className="card" onSubmit={submit} style={{ marginBottom: 16 }}>
+      <div className="section-header">
+        <span className="section-title">Novo treino</span>
+      </div>
 
-      <h4>Exercícios</h4>
-      {exercises.map((ex, i) => (
-        <div className="row" key={i}>
-          <div style={{ flex: 2 }}>
-            <label>Exercício</label>
-            <input value={ex.name} onChange={(e) => updateExercise(i, { name: e.target.value })} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label>Séries</label>
+      <div className="form-row" style={{ marginBottom: 14 }}>
+        <div>
+          <label>Nome do treino</label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            placeholder="Ex.: Treino A – Peito e Tríceps"
+          />
+        </div>
+        <div>
+          <label>Observações</label>
+          <input
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Instruções gerais…"
+          />
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 12 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '2fr 60px 80px 80px 36px',
+            gap: 8,
+            marginBottom: 6,
+          }}
+        >
+          <label style={{ margin: 0 }}>Exercício</label>
+          <label style={{ margin: 0 }}>Séries</label>
+          <label style={{ margin: 0 }}>Reps</label>
+          <label style={{ margin: 0 }}>Carga (kg)</label>
+          <span />
+        </div>
+
+        {exercises.map((ex, i) => (
+          <div
+            key={i}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '2fr 60px 80px 80px 36px',
+              gap: 8,
+              marginBottom: 8,
+              alignItems: 'center',
+            }}
+          >
+            <input
+              value={ex.name}
+              onChange={(e) => updateExercise(i, { name: e.target.value })}
+              placeholder="Ex.: Supino reto"
+            />
             <input
               type="number"
+              min={1}
               value={ex.sets}
               onChange={(e) => updateExercise(i, { sets: Number(e.target.value) })}
             />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label>Reps</label>
-            <input value={ex.reps} onChange={(e) => updateExercise(i, { reps: e.target.value })} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label>Carga</label>
+            <input
+              value={ex.reps}
+              onChange={(e) => updateExercise(i, { reps: e.target.value })}
+              placeholder="12"
+            />
             <input
               type="number"
+              step="0.5"
               value={ex.weightKg}
               onChange={(e) => updateExercise(i, { weightKg: e.target.value })}
+              placeholder="—"
             />
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={() => removeExercise(i)}
+              disabled={exercises.length === 1}
+              title="Remover"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
           </div>
-        </div>
-      ))}
-      <div className="row">
+        ))}
+      </div>
+
+      <div className="form-actions" style={{ justifyContent: 'space-between' }}>
         <button
           type="button"
-          className="ghost"
+          className="ghost sm"
           onClick={() => setExercises((prev) => [...prev, { ...emptyExercise }])}
         >
-          + Exercício
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Exercício
         </button>
-        <button type="submit">Salvar treino</button>
-        <button type="button" className="ghost" onClick={() => setOpen(false)}>
-          Cancelar
-        </button>
+        <div className="row">
+          <button type="button" className="ghost sm" onClick={() => setOpen(false)}>
+            Cancelar
+          </button>
+          <button type="submit">Salvar treino</button>
+        </div>
       </div>
     </form>
   );
