@@ -38,7 +38,7 @@ export function StudentHome() {
         <div className="card" key={w.id}>
           <strong>{w.name}</strong>
           {w.notes && <p className="muted">{w.notes}</p>}
-          <table>
+          <div className="table-scroll"><table>
             <thead>
               <tr>
                 <th>Exercício</th>
@@ -57,7 +57,7 @@ export function StudentHome() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       ))}
       {workouts.length === 0 && <p className="muted">Nenhum treino atribuído ainda.</p>}
@@ -82,7 +82,7 @@ export function StudentHome() {
         </div>
       </form>
       <div className="card">
-        <table>
+        <div className="table-scroll"><table>
           <thead>
             <tr>
               <th>Data</th>
@@ -99,7 +99,7 @@ export function StudentHome() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
         {progress.length === 0 && <p className="muted">Sem registros.</p>}
       </div>
 
@@ -115,7 +115,7 @@ export function StudentHome() {
 
       <h2>Pagamentos</h2>
       <div className="card">
-        <table>
+        <div className="table-scroll"><table>
           <thead>
             <tr>
               <th>Vencimento</th>
@@ -134,7 +134,7 @@ export function StudentHome() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
         {payments.length === 0 && <p className="muted">Sem lançamentos.</p>}
       </div>
     </div>

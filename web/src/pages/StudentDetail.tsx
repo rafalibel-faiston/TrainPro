@@ -153,7 +153,7 @@ function WorkoutsTab({
             </div>
           </div>
           {w.notes && <div className="workout-card-notes">{w.notes}</div>}
-          <table>
+          <div className="table-scroll"><table>
             <thead>
               <tr>
                 <th>Exercício</th>
@@ -172,7 +172,7 @@ function WorkoutsTab({
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       ))}
     </>
@@ -247,7 +247,7 @@ function ProgressTab({
         <div className="empty-state">Nenhum registro de evolução ainda.</div>
       ) : (
         <div className="card">
-          <table>
+          <div className="table-scroll"><table>
             <thead>
               <tr>
                 <th>Data</th>
@@ -266,7 +266,7 @@ function ProgressTab({
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
     </>
@@ -440,7 +440,7 @@ function PaymentsTab({
         <div className="empty-state">Nenhum lançamento ainda.</div>
       ) : (
         <div className="card">
-          <table>
+          <div className="table-scroll"><table>
             <thead>
               <tr>
                 <th>Vencimento</th>
@@ -472,7 +472,7 @@ function PaymentsTab({
                 );
               })}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
     </>
