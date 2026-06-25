@@ -12,5 +12,11 @@ export default defineConfig({
   preview: {
     allowedHosts: true,
     host: true,
+    proxy: {
+      '/api': {
+        target: 'https://trainprobackend-production.up.railway.app',
+        changeOrigin: true,
+      },
+    },
   },
 });
