@@ -11,5 +11,6 @@ export default defineConfig({
   },
   preview: {
     allowedHosts: true,
+    host: true,
   },
 });
