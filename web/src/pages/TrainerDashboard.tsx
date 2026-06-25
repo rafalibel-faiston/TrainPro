@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import type { Student } from '../types';
+import { Button } from '@/components/ui/heroui-button';
 
 function avatarColor(name: string): string {
   const palette = ['#52525B', '#5B7186', '#5F7A6B', '#7A6E8C', '#8A6E5E', '#566B7A', '#6E6E8A', '#7A6A6A'];
@@ -52,7 +53,7 @@ export function TrainerDashboard() {
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">Gerencie seus alunos e acompanhe o progresso</p>
         </div>
-        <button onClick={() => setShowForm((v) => !v)}>
+        <Button variant={showForm ? 'outline' : 'primary'} onClick={() => setShowForm((v) => !v)}>
           {showForm ? (
             <>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -68,7 +69,7 @@ export function TrainerDashboard() {
               Novo aluno
             </>
           )}
-        </button>
+        </Button>
       </div>
 
       {/* Metric cards */}
@@ -164,10 +165,10 @@ export function TrainerDashboard() {
             </div>
             {error && <p className="error">{error}</p>}
             <div className="form-actions">
-              <button type="button" className="ghost" onClick={() => setShowForm(false)}>
+              <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>
                 Cancelar
-              </button>
-              <button type="submit">Cadastrar aluno</button>
+              </Button>
+              <Button type="submit" variant="primary">Cadastrar aluno</Button>
             </div>
           </form>
         </div>

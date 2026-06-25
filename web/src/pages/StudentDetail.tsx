@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { api } from '../api';
 import type { Appointment, Payment, ProgressEntry, Workout } from '../types';
 import { WorkoutForm } from '../components/WorkoutForm';
+import { Button } from '@/components/ui/heroui-button';
 
 interface StudentFull {
   id: string;
@@ -238,7 +239,7 @@ function ProgressTab({
           />
         </div>
         <div className="form-actions">
-          <button type="submit">Registrar</button>
+          <Button type="submit" variant="primary">Registrar</Button>
         </div>
       </form>
 
@@ -336,7 +337,7 @@ function AppointmentsTab({
           </div>
         </div>
         <div className="form-actions">
-          <button type="submit">Agendar</button>
+          <Button type="submit" variant="primary">Agendar</Button>
         </div>
       </form>
 
@@ -431,7 +432,7 @@ function PaymentsTab({
           </div>
         </div>
         <div className="form-actions">
-          <button type="submit">Lançar</button>
+          <Button type="submit" variant="primary">Lançar</Button>
         </div>
       </form>
 
@@ -462,9 +463,9 @@ function PaymentsTab({
                     </td>
                     <td>
                       {p.status !== 'PAID' && (
-                        <button className="ghost sm" onClick={() => markPaid(p.id)}>
+                        <Button variant="ghost" size="sm" onClick={() => markPaid(p.id)}>
                           Dar baixa
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>

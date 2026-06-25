@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../auth';
 import { ApiError } from '../api';
 import type { Role } from '../types';
+import { Button } from '@/components/ui/heroui-button';
 
 export function LoginPage() {
   const { login, register } = useAuth();
@@ -96,9 +97,9 @@ export function LoginPage() {
 
         {error && <p className="error">{error}</p>}
 
-        <button type="submit" className="auth-btn" disabled={busy}>
+        <Button type="submit" variant="primary" size="lg" block disabled={busy} style={{ marginTop: 4 }}>
           {busy ? 'Aguarde…' : mode === 'login' ? 'Entrar' : 'Criar conta'}
-        </button>
+        </Button>
 
         <p className="auth-footer">
           {mode === 'login' ? 'Não tem conta? ' : 'Já tem conta? '}

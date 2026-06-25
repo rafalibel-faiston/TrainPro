@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
 import type { Appointment, Payment, ProgressEntry, Workout } from '../types';
+import { Button } from '@/components/ui/heroui-button';
 
 export function StudentHome() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -77,7 +78,7 @@ export function StudentHome() {
             <label>Notas</label>
             <input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
           </div>
-          <button type="submit">Registrar</button>
+          <Button type="submit" variant="primary">Registrar</Button>
         </div>
       </form>
       <div className="card">
