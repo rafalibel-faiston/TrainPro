@@ -6,8 +6,10 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      // Encaminha as chamadas /api para o backend em desenvolvimento.
       '/api': 'http://localhost:4000',
     },
+  },
+  preview: {
+    allowedHosts: 'all',
   },
 });
