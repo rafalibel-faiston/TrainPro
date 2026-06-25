@@ -53,8 +53,26 @@
   --r-lg: 14px;
   --r-xl: 20px;
 
-  /* Transition */
+  /* Transition & easing */
   --t: 160ms ease;
+  --ease:     cubic-bezier(0.22, 1, 0.36, 1);   /* easeOutExpo-ish: entra rápido, assenta suave */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Keyframes ──────────────────────────────────────────────────── */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pop-in {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.985); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* ── Reset ──────────────────────────────────────────────────────── */
@@ -109,6 +127,13 @@ h4 { font-size: 0.85rem; margin-bottom: 8px; }
   padding: 32px 36px;
   max-width: 1140px;
   width: 100%;
+  animation: fade-in 0.3s ease both;
+}
+
+/* Cabeçalho da página desce suavemente ao entrar */
+.app-content > .page-header,
+.app-content > .detail-header {
+  animation: rise-in 0.4s var(--ease) both;
 }
 
 /* ── Sidebar ────────────────────────────────────────────────────── */
@@ -202,7 +227,10 @@ h4 { font-size: 0.85rem; margin-bottom: 8px; }
 .sidebar-link svg {
   width: 16px; height: 16px;
   flex-shrink: 0;
+  transition: transform var(--t);
 }
+
+.sidebar-link:hover svg { transform: translateX(2px); }
 
 .sidebar-footer {
   padding: 14px 12px;
@@ -305,12 +333,21 @@ h4 { font-size: 0.85rem; margin-bottom: 8px; }
   padding: 20px;
   position: relative;
   overflow: hidden;
-  transition: border-color var(--t);
+  transition: border-color var(--t), transform var(--t), box-shadow var(--t);
+  animation: rise-in 0.45s var(--ease) both;
 }
 
 .metric-card:hover {
   border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px -10px rgba(24, 24, 27, 0.18);
 }
+
+/* Stagger sutil na entrada dos cards de métrica */
+.metric-grid > .metric-card:nth-child(1) { animation-delay: 0.02s; }
+.metric-grid > .metric-card:nth-child(2) { animation-delay: 0.08s; }
+.metric-grid > .metric-card:nth-child(3) { animation-delay: 0.14s; }
+.metric-grid > .metric-card:nth-child(4) { animation-delay: 0.20s; }
 
 .metric-card-icon {
   width: 36px; height: 36px;
@@ -373,14 +410,25 @@ h4 { font-size: 0.85rem; margin-bottom: 8px; }
   padding: 18px 20px;
   display: block;
   color: var(--text);
-  transition: border-color var(--t), background var(--t);
+  transition: border-color var(--t), background var(--t), transform var(--t), box-shadow var(--t);
   cursor: pointer;
+  animation: rise-in 0.4s var(--ease) both;
 }
 
 .student-card:hover {
   border-color: var(--border-strong);
   background: var(--card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -14px rgba(24, 24, 27, 0.22);
 }
+
+/* Stagger leve na grade de alunos */
+.student-grid > .student-card:nth-child(1) { animation-delay: 0.03s; }
+.student-grid > .student-card:nth-child(2) { animation-delay: 0.07s; }
+.student-grid > .student-card:nth-child(3) { animation-delay: 0.11s; }
+.student-grid > .student-card:nth-child(4) { animation-delay: 0.15s; }
+.student-grid > .student-card:nth-child(5) { animation-delay: 0.19s; }
+.student-grid > .student-card:nth-child(6) { animation-delay: 0.23s; }
 
 .student-card-top {
   display: flex;
@@ -477,7 +525,7 @@ button {
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
-  transition: background var(--t), border-color var(--t);
+  transition: background var(--t), border-color var(--t), transform 90ms ease, box-shadow var(--t);
   white-space: nowrap;
   line-height: 1;
 }
@@ -486,7 +534,7 @@ button:hover:not(:disabled) {
   background: var(--accent-hover);
 }
 
-button:active:not(:disabled) { transform: translateY(0.5px); }
+button:active:not(:disabled) { transform: scale(0.97); }
 button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 button.ghost {
@@ -681,6 +729,7 @@ tbody tr:hover td { background: var(--card-hover); }
   padding: 36px;
   position: relative;
   z-index: 1;
+  animation: pop-in 0.5s var(--ease) both;
 }
 
 .auth-logo {
@@ -903,5 +952,7 @@ tbody tr:hover td { background: var(--card-hover); }
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
