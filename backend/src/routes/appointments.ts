@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { prisma } from '../prisma.js';
+import { db as prisma } from '../db.js';
 import { authenticate } from '../middleware/auth.js';
 import { validateBody } from '../middleware/validate.js';
 import { trainerProfileId, studentProfileId, studentBelongsToTrainer } from '../lib/profiles.js';

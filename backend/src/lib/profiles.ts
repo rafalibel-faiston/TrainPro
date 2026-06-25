@@ -1,4 +1,4 @@
-import { prisma } from '../prisma.js';
+import { db as prisma } from '../db.js';
 
 // Resolve o id do TrainerProfile do usuário autenticado (ou null se não for personal).
 export async function trainerProfileId(userId: string): Promise<string | null> {

@@ -9,4 +9,5 @@ export const env = {
   webOrigin: process.env.WEB_ORIGIN ?? 'http://localhost:5173',
   // Pasta do build do app web a ser servido em produção (opcional).
   webDist: process.env.WEB_DIST,
+  dbFile: process.env.DB_FILE,
 };

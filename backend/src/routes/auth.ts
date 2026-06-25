@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { prisma } from '../prisma.js';
+import { db as prisma } from '../db.js';
 import { signToken, type Role } from '../auth/jwt.js';
 import { validateBody } from '../middleware/validate.js';
 import { authenticate } from '../middleware/auth.js';
