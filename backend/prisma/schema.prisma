@@ -1,0 +1,127 @@
+// Schema do banco de dados do TrainPro.
+// Em produção troque o provider para "postgresql" e ajuste a DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite não suporta enums no Prisma; usamos String com valores controlados na aplicação.
+// Role: "TRAINER" | "STUDENT"
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Perfis (um usuário é personal OU aluno)
+  trainerProfile TrainerProfile?
+  studentProfile StudentProfile?
+}
+
+model TrainerProfile {
+  id     String  @id @default(cuid())
+  userId String  @unique
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio    String?
+
+  students     StudentProfile[]
+  workouts     Workout[]
+  appointments Appointment[]
+}
+
+model StudentProfile {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  birthDate DateTime?
+  goal      String?
+
+  // Vínculo com o personal responsável
+  trainerId String?
+  trainer   TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+
+  workouts     Workout[]
+  progress     ProgressEntry[]
+  appointments Appointment[]
+  payments     Payment[]
+}
+
+model Workout {
+  id        String   @id @default(cuid())
+  name      String
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  trainerId String?
+  trainer   TrainerProfile? @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+
+  exercises WorkoutExercise[]
+}
+
+model WorkoutExercise {
+  id          String  @id @default(cuid())
+  name        String
+  sets        Int     @default(3)
+  reps        String  @default("12") // texto para permitir "8-12", "até a falha", etc.
+  weightKg    Float?
+  restSeconds Int?
+  order       Int     @default(0)
+
+  workoutId String
+  workout   Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+}
+
+model ProgressEntry {
+  id           String   @id @default(cuid())
+  date         DateTime @default(now())
+  weightKg     Float?
+  bodyFat      Float? // percentual de gordura
+  measurements String? // JSON com medidas (cintura, braço, etc.)
+  notes        String?
+
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  // status: "SCHEDULED" | "COMPLETED" | "CANCELED"
+  id       String   @id @default(cuid())
+  startsAt DateTime
+  endsAt   DateTime
+  status   String   @default("SCHEDULED")
+  notes    String?
+
+  trainerId String
+  trainer   TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  // status: "PENDING" | "PAID" | "OVERDUE"
+  id        String    @id @default(cuid())
+  amount    Float
+  dueDate   DateTime
+  paidAt    DateTime?
+  status    String    @default("PENDING")
+  notes     String?
+  createdAt DateTime      @default(now())
+
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
