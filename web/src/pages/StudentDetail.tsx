@@ -15,7 +15,7 @@ interface StudentFull {
 }
 
 function avatarColor(name: string): string {
-  const palette = ['#22C55E', '#3B82F6', '#A855F7', '#F97316', '#EC4899', '#14B8A6', '#6366F1', '#F59E0B'];
+  const palette = ['#52525B', '#5B7186', '#5F7A6B', '#7A6E8C', '#8A6E5E', '#566B7A', '#6E6E8A', '#7A6A6A'];
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0x7fffffff;
   return palette[h % palette.length];
