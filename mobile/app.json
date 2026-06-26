@@ -10,6 +10,12 @@
     },
     "ios": { "supportsTablet": true },
     "android": {},
+    "plugins": [
+      [
+        "expo-calendar",
+        { "calendarPermission": "O TrainPro adiciona suas sessões de treino à agenda do seu celular." }
+      ]
+    ],
     "extra": {
       "apiUrl": "http://localhost:4000"
     }

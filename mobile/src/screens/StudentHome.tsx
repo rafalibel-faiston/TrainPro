@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { api } from '../api';
+import { addToCalendar } from '../calendar';
 import type { Appointment, Payment, ProgressEntry, Workout, User } from '../types';
 import { AppHeader, Badge, Button, Card, Chip, EmptyState, Field, Loading, Tabs } from '../ui';
 import { COLORS, formatDate, formatDateTime, formatMoney, parseNum, paymentInfo } from '../theme';
@@ -201,6 +202,24 @@ export function StudentHome({
                     </Badge>
                   </View>
                   {a.notes ? <Text style={st.itemNote}>{a.notes}</Text> : null}
+                  {a.status === 'SCHEDULED' && (
+                    <View style={{ marginTop: 10, alignSelf: 'flex-start' }}>
+                      <Button
+                        title="Adicionar à agenda"
+                        icon="calendar"
+                        size="sm"
+                        variant="ghost"
+                        onPress={async () => {
+                          try {
+                            await addToCalendar('Sessão de treino — TrainPro', new Date(a.startsAt), new Date(a.endsAt), a.notes ?? undefined);
+                            Alert.alert('Pronto!', 'Sessão adicionada à agenda do celular.');
+                          } catch (e) {
+                            Alert.alert('Ops', e instanceof Error ? e.message : 'Não foi possível adicionar.');
+                          }
+                        }}
+                      />
+                    </View>
+                  )}
                 </Card>
               ))
             ) : (

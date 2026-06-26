@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 import { api } from '../api';
+import { addToCalendar } from '../calendar';
 import type { Appointment, Payment, ProgressEntry, Workout, WorkoutSession } from '../types';
 import {
   AppHeader,
@@ -231,6 +232,15 @@ function ProgressList({ entries }: { entries: ProgressEntry[] }) {
   );
 }
 
+async function addAppointmentToCalendar(a: Appointment) {
+  try {
+    await addToCalendar('Sessão de treino — TrainPro', new Date(a.startsAt), new Date(a.endsAt), a.notes ?? undefined);
+    Alert.alert('Pronto!', 'Sessão adicionada à agenda do celular.');
+  } catch (e) {
+    Alert.alert('Ops', e instanceof Error ? e.message : 'Não foi possível adicionar à agenda.');
+  }
+}
+
 function AppointmentList({ items }: { items: Appointment[] }) {
   if (!items.length) return <EmptyState icon="calendar" text="Nenhuma sessão agendada." />;
   const tone = (s: string) => (s === 'COMPLETED' ? 'success' : s === 'CANCELED' ? 'danger' : 'neutral');
@@ -244,6 +254,11 @@ function AppointmentList({ items }: { items: Appointment[] }) {
             <Badge tone={tone(a.status)}>{label(a.status)}</Badge>
           </View>
           {a.notes ? <Text style={st.itemNote}>{a.notes}</Text> : null}
+          {a.status === 'SCHEDULED' && (
+            <View style={{ marginTop: 10, alignSelf: 'flex-start' }}>
+              <Button title="Adicionar à agenda" icon="calendar" size="sm" variant="ghost" onPress={() => addAppointmentToCalendar(a)} />
+            </View>
+          )}
         </Card>
       ))}
     </>
