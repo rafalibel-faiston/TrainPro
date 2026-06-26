@@ -31,7 +31,7 @@ export function Login({ onLogin }: { onLogin: (u: User) => void }) {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.bgTop }}>
       <Background />
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}

@@ -80,7 +80,7 @@ export function StudentHome({ user, onLogout }: { user: User; onLogout: () => vo
       />
 
       <LinearGradient
-        colors={['rgba(46,144,255,0.22)', 'rgba(30,111,224,0.10)']}
+        colors={['rgba(110,139,255,0.22)', 'rgba(124,92,255,0.10)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={st.hero}

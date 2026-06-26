@@ -81,7 +81,7 @@ export function TrainerHome({
       />
 
       <LinearGradient
-        colors={['rgba(46,144,255,0.22)', 'rgba(30,111,224,0.10)']}
+        colors={['rgba(110,139,255,0.22)', 'rgba(124,92,255,0.10)']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={st.hero}
@@ -179,7 +179,7 @@ const st = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(46,144,255,0.18)',
+    backgroundColor: 'rgba(110,139,255,0.18)',
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: 'center',

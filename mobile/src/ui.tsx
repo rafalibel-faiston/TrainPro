@@ -22,6 +22,8 @@ export function Background() {
         end={{ x: 0, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
+      <View style={[styles.orb, styles.orbIndigo]} />
+      <View style={[styles.orb, styles.orbViolet]} />
     </View>
   );
 }
@@ -115,9 +117,9 @@ export function Button({
 
   if (isPrimary) {
     return (
-      <TouchableOpacity activeOpacity={0.85} onPress={onPress} disabled={off} style={full && { width: '100%' }}>
+      <TouchableOpacity activeOpacity={0.85} onPress={onPress} disabled={off} style={[styles.btnGlow, full && { width: '100%' }]}>
         <LinearGradient
-          colors={[COLORS.accent, COLORS.accentDeep]}
+          colors={[COLORS.gradA, COLORS.gradB]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={[styles.btn, { height }, off && { opacity: 0.6 }]}
@@ -238,6 +240,10 @@ export function Loading() {
 }
 
 const styles = StyleSheet.create({
+  orb: { position: 'absolute', borderRadius: 9999 },
+  orbIndigo: { width: 460, height: 460, top: -180, right: -150, backgroundColor: 'rgba(99,102,241,0.20)' },
+  orbViolet: { width: 380, height: 380, bottom: -160, left: -130, backgroundColor: 'rgba(124,92,255,0.14)' },
+
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 18 },
   backBtn: {
     width: 40,
@@ -259,11 +265,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#0F1B2D',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2,
   },
   sectionTitle: { color: COLORS.text, fontSize: 16, fontWeight: '700', marginBottom: 12 },
 
@@ -276,6 +282,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   btnGhost: { backgroundColor: COLORS.surfaceStrong, borderWidth: 1, borderColor: COLORS.border },
+  btnGlow: {
+    borderRadius: 12,
+    shadowColor: '#5B6CFF',
+    shadowOpacity: 0.45,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+  },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 
   label: { color: COLORS.text2, fontSize: 12, fontWeight: '600', marginBottom: 6 },
