@@ -19,11 +19,9 @@ export function Background() {
       <LinearGradient
         colors={[COLORS.bgTop, COLORS.bgMid, COLORS.bgBot]}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 0, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
-      <View style={[styles.glow, styles.glowBlue]} />
-      <View style={[styles.glow, styles.glowCyan]} />
     </View>
   );
 }
@@ -240,10 +238,6 @@ export function Loading() {
 }
 
 const styles = StyleSheet.create({
-  glow: { position: 'absolute', borderRadius: 9999, opacity: 0.5 },
-  glowBlue: { width: 420, height: 420, top: -150, right: -120, backgroundColor: 'rgba(46,144,255,0.22)' },
-  glowCyan: { width: 360, height: 360, bottom: -130, left: -110, backgroundColor: 'rgba(14,165,233,0.15)' },
-
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 18 },
   backBtn: {
     width: 40,
@@ -265,6 +259,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
+    shadowColor: '#0F1B2D',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 1,
   },
   sectionTitle: { color: COLORS.text, fontSize: 16, fontWeight: '700', marginBottom: 12 },
 
@@ -276,14 +275,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
   },
-  btnGhost: { backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
+  btnGhost: { backgroundColor: COLORS.surfaceStrong, borderWidth: 1, borderColor: COLORS.border },
   btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 
   label: { color: COLORS.text2, fontSize: 12, fontWeight: '600', marginBottom: 6 },
   field: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: COLORS.surfaceStrong,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 12,
@@ -292,7 +291,7 @@ const styles = StyleSheet.create({
   input: { flex: 1, color: COLORS.text, paddingVertical: 12, fontSize: 15 },
 
   chip: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: COLORS.surfaceStrong,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 999,
@@ -313,7 +312,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  tabOn: { backgroundColor: 'rgba(46,144,255,0.18)', borderColor: 'rgba(46,144,255,0.5)' },
+  tabOn: { backgroundColor: COLORS.accentSoft, borderColor: COLORS.accent },
   tabText: { color: COLORS.text2, fontSize: 13, fontWeight: '600' },
   tabTextOn: { color: COLORS.accent },
 

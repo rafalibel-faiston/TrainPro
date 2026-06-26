@@ -39,7 +39,7 @@ export default function App() {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.bgTop }}>
         <Background />
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <ActivityIndicator color={COLORS.accent} size="large" />
       </View>
     );
@@ -50,7 +50,7 @@ export default function App() {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.bgTop }}>
       <Background />
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       {user.role === 'TRAINER' ? (
         <TrainerArea user={user} onLogout={logout} />
       ) : (

@@ -1,22 +1,33 @@
-// Paleta e tokens compartilhados do app (tema dark premium).
+// Paleta e tokens compartilhados do app — TEMA CLARO (day).
 export const COLORS = {
-  bgTop: '#0A1124',
-  bgMid: '#0C1B3A',
-  bgBot: '#0B2447',
-  accent: '#2E90FF',
-  accentDeep: '#1E6FE0',
-  text: '#EAF2FB',
-  text2: '#9FB3C8',
-  text3: '#5E7390',
-  surface: 'rgba(255,255,255,0.05)',
-  surfaceStrong: 'rgba(255,255,255,0.08)',
-  border: 'rgba(255,255,255,0.10)',
-  success: '#34D399',
-  successBg: 'rgba(52,211,153,0.14)',
-  warning: '#FBBF24',
-  warningBg: 'rgba(251,191,36,0.14)',
-  danger: '#F87171',
-  dangerBg: 'rgba(248,113,113,0.14)',
+  // Fundo (gradiente claro e suave)
+  bgTop: '#FFFFFF',
+  bgMid: '#F3F7FD',
+  bgBot: '#E9F1FB',
+
+  // Superfícies
+  surface: '#FFFFFF',
+  surfaceStrong: '#EEF3FA',
+  border: '#E3E9F1',
+  borderStrong: '#D2DBE7',
+
+  // Acento (azul limpo)
+  accent: '#0F6FFF',
+  accentDeep: '#0A57D6',
+  accentSoft: 'rgba(15,111,255,0.10)',
+
+  // Texto
+  text: '#0F1B2D',
+  text2: '#56657C',
+  text3: '#8A99AE',
+
+  // Status
+  success: '#15A34A',
+  successBg: 'rgba(21,163,74,0.12)',
+  warning: '#B45309',
+  warningBg: 'rgba(180,83,9,0.12)',
+  danger: '#DC2626',
+  dangerBg: 'rgba(220,38,38,0.10)',
 };
 
 export function initials(name: string) {
@@ -42,6 +53,10 @@ export function formatDateTime(iso?: string | null) {
   return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
+export function formatMoney(v: number) {
+  return 'R$ ' + v.toFixed(2).replace('.', ',');
+}
+
 // Converte texto digitado (aceitando vírgula como separador decimal, comum no
 // pt-BR) em número. Retorna undefined quando vazio/ inválido.
 export function parseNum(s: string): number | undefined {
@@ -51,13 +66,16 @@ export function parseNum(s: string): number | undefined {
   return isNaN(n) ? undefined : n;
 }
 
-export function formatMoney(v: number) {
-  return 'R$ ' + v.toFixed(2).replace('.', ',');
-}
-
 // Status de pagamento calculado (igual à web): pago / atrasado / pendente.
 export function paymentInfo(status: string, dueDate: string) {
   if (status === 'PAID') return { label: 'Pago', tone: 'success' as const };
   if (new Date(dueDate).getTime() < Date.now()) return { label: 'Atrasado', tone: 'danger' as const };
   return { label: 'Pendente', tone: 'warning' as const };
+}
+
+// mm:ss a partir de segundos.
+export function formatDuration(totalSeconds: number) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
