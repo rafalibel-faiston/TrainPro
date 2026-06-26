@@ -56,6 +56,25 @@ export interface Payment {
   student?: { user: { name: string } };
 }
 
+export interface SetLog {
+  id: string;
+  exerciseName: string;
+  setNumber: number;
+  weightKg?: number | null;
+  reps?: number | null;
+  done: boolean;
+  order: number;
+}
+
+export interface WorkoutSession {
+  id: string;
+  startedAt: string;
+  durationSec: number;
+  workoutId: string;
+  workout?: { id: string; name: string };
+  sets: SetLog[];
+}
+
 export interface Student {
   id: string;
   name: string;

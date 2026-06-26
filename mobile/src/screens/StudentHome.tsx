@@ -9,7 +9,15 @@ import { COLORS, formatDate, formatDateTime, formatMoney, parseNum, paymentInfo 
 
 type TabKey = 'treinos' | 'evolucao' | 'agenda' | 'pagamentos';
 
-export function StudentHome({ user, onLogout }: { user: User; onLogout: () => void }) {
+export function StudentHome({
+  user,
+  onLogout,
+  onOpenWorkout,
+}: {
+  user: User;
+  onLogout: () => void;
+  onOpenWorkout: (w: Workout) => void;
+}) {
   const [tab, setTab] = useState<TabKey>('treinos');
   const [loading, setLoading] = useState(true);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -140,17 +148,25 @@ export function StudentHome({ user, onLogout }: { user: User; onLogout: () => vo
           {tab === 'treinos' &&
             (workouts.length ? (
               workouts.map((w) => (
-                <Card key={w.id}>
-                  <Text style={st.itemTitle}>{w.name}</Text>
-                  {w.notes ? <Text style={st.itemNote}>{w.notes}</Text> : null}
-                  <View style={st.chips}>
-                    {w.exercises.map((ex) => (
-                      <Chip key={ex.id}>
-                        {ex.name} · {ex.sets}x{ex.reps}
-                      </Chip>
-                    ))}
-                  </View>
-                </Card>
+                <TouchableOpacity key={w.id} activeOpacity={0.85} onPress={() => onOpenWorkout(w)}>
+                  <Card>
+                    <View style={st.rowBetween}>
+                      <Text style={st.itemTitle}>{w.name}</Text>
+                      <View style={st.playPill}>
+                        <Feather name="play" size={12} color={COLORS.accent} />
+                        <Text style={st.playText}>Treinar</Text>
+                      </View>
+                    </View>
+                    {w.notes ? <Text style={st.itemNote}>{w.notes}</Text> : null}
+                    <View style={st.chips}>
+                      {w.exercises.map((ex) => (
+                        <Chip key={ex.id}>
+                          {ex.name} · {ex.sets}x{ex.reps}
+                        </Chip>
+                      ))}
+                    </View>
+                  </Card>
+                </TouchableOpacity>
               ))
             ) : (
               <EmptyState icon="activity" text="Nenhum treino ainda." />
@@ -245,4 +261,14 @@ const st = StyleSheet.create({
   metricInline: { color: COLORS.accent, fontSize: 13, fontWeight: '600' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  playPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: COLORS.accentSoft,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  playText: { color: COLORS.accent, fontSize: 12, fontWeight: '700' },
 });

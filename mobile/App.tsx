@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { api, getToken, setToken } from './src/api';
-import type { User } from './src/types';
+import type { User, Workout } from './src/types';
 import { Background } from './src/ui';
 import { COLORS } from './src/theme';
 import { Login } from './src/screens/Login';
 import { TrainerHome } from './src/screens/TrainerHome';
 import { StudentDetail } from './src/screens/StudentDetail';
 import { StudentHome } from './src/screens/StudentHome';
+import { WorkoutPlayer } from './src/screens/WorkoutPlayer';
 
 type TrainerRoute = { name: 'home' } | { name: 'student'; id: string; studentName: string };
 
@@ -54,7 +55,7 @@ export default function App() {
       {user.role === 'TRAINER' ? (
         <TrainerArea user={user} onLogout={logout} />
       ) : (
-        <StudentHome user={user} onLogout={logout} />
+        <StudentArea user={user} onLogout={logout} />
       )}
     </View>
   );
@@ -80,4 +81,14 @@ function TrainerArea({ user, onLogout }: { user: User; onLogout: () => void }) {
       onLogout={onLogout}
     />
   );
+}
+
+function StudentArea({ user, onLogout }: { user: User; onLogout: () => void }) {
+  const [workout, setWorkout] = useState<Workout | null>(null);
+
+  if (workout) {
+    return <WorkoutPlayer workout={workout} onBack={() => setWorkout(null)} />;
+  }
+
+  return <StudentHome user={user} onLogout={onLogout} onOpenWorkout={setWorkout} />;
 }
