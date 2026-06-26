@@ -7,7 +7,9 @@ import { Background, BottomTabBar } from './src/ui';
 import { COLORS } from './src/theme';
 import { Login } from './src/screens/Login';
 import { Alunos } from './src/screens/Alunos';
-import { ComingSoon } from './src/screens/ComingSoon';
+import { NovoTreino } from './src/screens/NovoTreino';
+import { Agenda } from './src/screens/Agenda';
+import { Chat } from './src/screens/Chat';
 import { StudentDetail } from './src/screens/StudentDetail';
 import { StudentHome } from './src/screens/StudentHome';
 import { WorkoutPlayer } from './src/screens/WorkoutPlayer';
@@ -76,15 +78,9 @@ function TrainerTabs({ user, onLogout }: { user: User; onLogout: () => void }) {
       {tab === 'alunos' && (
         <Alunos user={user} onOpenStudent={(id, name) => setStudent({ id, name })} onLogout={onLogout} />
       )}
-      {tab === 'treino' && (
-        <ComingSoon eyebrow="Montar e enviar" title="Treino" text="Tela de montar treino chegando na próxima atualização." />
-      )}
-      {tab === 'agenda' && (
-        <ComingSoon eyebrow="Semana atual" title="Agenda" text="Visão da semana com gráfico chegando em breve." />
-      )}
-      {tab === 'chat' && (
-        <ComingSoon eyebrow="Conversas" title="Mensagens" text="O chat com seus alunos chegará numa próxima etapa." />
-      )}
+      {tab === 'treino' && <NovoTreino />}
+      {tab === 'agenda' && <Agenda />}
+      {tab === 'chat' && <Chat />}
 
       <BottomTabBar<TrainerTab>
         active={tab}
