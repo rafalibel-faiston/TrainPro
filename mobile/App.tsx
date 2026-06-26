@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { api, getToken, setToken } from './src/api';
 import type { User, Workout } from './src/types';
-import { Background } from './src/ui';
+import { Background, BottomTabBar } from './src/ui';
 import { COLORS } from './src/theme';
 import { Login } from './src/screens/Login';
-import { TrainerHome } from './src/screens/TrainerHome';
+import { Alunos } from './src/screens/Alunos';
+import { ComingSoon } from './src/screens/ComingSoon';
 import { StudentDetail } from './src/screens/StudentDetail';
 import { StudentHome } from './src/screens/StudentHome';
 import { WorkoutPlayer } from './src/screens/WorkoutPlayer';
 
-type TrainerRoute = { name: 'home' } | { name: 'student'; id: string; studentName: string };
+type TrainerTab = 'alunos' | 'treino' | 'agenda' | 'chat';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -53,7 +54,7 @@ export default function App() {
       <Background />
       <StatusBar style="light" />
       {user.role === 'TRAINER' ? (
-        <TrainerArea user={user} onLogout={logout} />
+        <TrainerTabs user={user} onLogout={logout} />
       ) : (
         <StudentArea user={user} onLogout={logout} />
       )}
@@ -61,25 +62,41 @@ export default function App() {
   );
 }
 
-function TrainerArea({ user, onLogout }: { user: User; onLogout: () => void }) {
-  const [route, setRoute] = useState<TrainerRoute>({ name: 'home' });
+function TrainerTabs({ user, onLogout }: { user: User; onLogout: () => void }) {
+  const [tab, setTab] = useState<TrainerTab>('alunos');
+  const [student, setStudent] = useState<{ id: string; name: string } | null>(null);
 
-  if (route.name === 'student') {
-    return (
-      <StudentDetail
-        studentId={route.id}
-        studentName={route.studentName}
-        onBack={() => setRoute({ name: 'home' })}
-      />
-    );
+  // Detalhe do aluno ocupa a tela toda (esconde as abas).
+  if (student) {
+    return <StudentDetail studentId={student.id} studentName={student.name} onBack={() => setStudent(null)} />;
   }
 
   return (
-    <TrainerHome
-      user={user}
-      onOpenStudent={(id, name) => setRoute({ name: 'student', id, studentName: name })}
-      onLogout={onLogout}
-    />
+    <View style={{ flex: 1 }}>
+      {tab === 'alunos' && (
+        <Alunos user={user} onOpenStudent={(id, name) => setStudent({ id, name })} onLogout={onLogout} />
+      )}
+      {tab === 'treino' && (
+        <ComingSoon eyebrow="Montar e enviar" title="Treino" text="Tela de montar treino chegando na próxima atualização." />
+      )}
+      {tab === 'agenda' && (
+        <ComingSoon eyebrow="Semana atual" title="Agenda" text="Visão da semana com gráfico chegando em breve." />
+      )}
+      {tab === 'chat' && (
+        <ComingSoon eyebrow="Conversas" title="Mensagens" text="O chat com seus alunos chegará numa próxima etapa." />
+      )}
+
+      <BottomTabBar<TrainerTab>
+        active={tab}
+        onChange={setTab}
+        items={[
+          { key: 'alunos', label: 'Alunos', icon: 'users' },
+          { key: 'treino', label: 'Treino', icon: 'activity' },
+          { key: 'agenda', label: 'Agenda', icon: 'calendar' },
+          { key: 'chat', label: 'Chat', icon: 'message-square' },
+        ]}
+      />
+    </View>
   );
 }
 

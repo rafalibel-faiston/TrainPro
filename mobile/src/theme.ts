@@ -1,36 +1,52 @@
-// Paleta e tokens — TEMA DARK PREMIUM (pegada Cruip "Open").
+// Paleta e tokens — TEMA DARK + ACENTO LIMÃO (base nas telas enviadas pelo cliente).
 export const COLORS = {
-  // Fundo (quase preto com leve tom azulado)
-  bgTop: '#0A0B11',
-  bgMid: '#0B0D16',
-  bgBot: '#0C1022',
+  // Fundo quase preto
+  bgTop: '#0B0B10',
+  bgMid: '#0A0A0E',
+  bgBot: '#0C0C12',
 
   // Superfícies
-  surface: '#14161F',
-  surfaceStrong: '#1B1E2A',
-  border: 'rgba(255,255,255,0.08)',
-  borderStrong: 'rgba(255,255,255,0.16)',
+  surface: '#15151C',
+  surfaceStrong: '#1C1C25',
+  border: 'rgba(255,255,255,0.07)',
+  borderStrong: 'rgba(255,255,255,0.14)',
 
-  // Acento (azul → índigo, com glow)
-  accent: '#6E8BFF',
-  accentDeep: '#6366F1',
-  gradA: '#4F7BFF',
-  gradB: '#7C5CFF',
-  accentSoft: 'rgba(110,139,255,0.14)',
+  // Acento — verde-limão
+  accent: '#A3E635',
+  accentDeep: '#84CC16',
+  accentSoft: 'rgba(163,230,53,0.14)',
+  onAccent: '#0A0A0A', // texto sobre o limão
 
   // Texto
   text: '#F4F6FB',
-  text2: '#A2A9BC',
-  text3: '#646B80',
+  text2: '#9AA4B2',
+  text3: '#646B7A',
+  eyebrow: '#6E7A8A', // rótulo pequeno acima dos títulos
 
   // Status
-  success: '#34D399',
-  successBg: 'rgba(52,211,153,0.14)',
+  success: '#A3E635',
+  successBg: 'rgba(163,230,53,0.14)',
   warning: '#FBBF24',
   warningBg: 'rgba(251,191,36,0.14)',
   danger: '#F87171',
   dangerBg: 'rgba(248,113,113,0.14)',
+
+  // Cores para avatares e gráficos
+  c1: '#3B82F6',
+  c2: '#EF6B53',
+  c3: '#8B5CF6',
+  c4: '#22C2A6',
+  c5: '#EC4899',
+  c6: '#F59E0B',
 };
+
+const AVATAR = [COLORS.c1, COLORS.c2, COLORS.c3, COLORS.c4, COLORS.c5, COLORS.c6, COLORS.accentDeep];
+
+export function avatarColor(name: string): string {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0x7fffffff;
+  return AVATAR[h % AVATAR.length];
+}
 
 export function initials(name: string) {
   return name
@@ -53,6 +69,13 @@ export function formatDateTime(iso?: string | null) {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return '—';
   return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+export function formatTime(iso?: string | null) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
 export function formatMoney(v: number) {
