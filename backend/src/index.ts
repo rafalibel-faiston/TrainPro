@@ -10,6 +10,7 @@ import { workoutsRouter } from './routes/workouts.js';
 import { progressRouter } from './routes/progress.js';
 import { appointmentsRouter } from './routes/appointments.js';
 import { paymentsRouter } from './routes/payments.js';
+import { workoutSessionsRouter } from './routes/workoutSessions.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/api/workouts', workoutsRouter);
 app.use('/api/progress', progressRouter);
 app.use('/api/appointments', appointmentsRouter);
 app.use('/api/payments', paymentsRouter);
+app.use('/api/workout-sessions', workoutSessionsRouter);
 
 // Qualquer rota /api desconhecida responde 404 em JSON (e não o index.html do SPA).
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Rota não encontrada.' }));
