@@ -39,6 +39,36 @@ export function WorkoutPlayer({ workout, onBack }: { workout: Workout; onBack: (
     return init;
   });
 
+  // Referência da última sessão deste treino (estilo Hevy): carga/reps por série.
+  const [prev, setPrev] = useState<Record<string, ({ weight?: number | null; reps?: number | null } | undefined)[]>>({});
+
+  useEffect(() => {
+    api
+      .get<WorkoutSession[]>('/workout-sessions')
+      .then((all) => {
+        const last = all.filter((s) => s.workoutId === workout.id)[0]; // API devolve do mais recente
+        if (!last) return;
+        const map: Record<string, ({ weight?: number | null; reps?: number | null } | undefined)[]> = {};
+        for (const set of last.sets) {
+          (map[set.exerciseName] ||= [])[set.setNumber - 1] = { weight: set.weightKg, reps: set.reps };
+        }
+        setPrev(map);
+        // Pré-preenche a carga das séries ainda vazias com a da última vez.
+        setLogs((cur) => {
+          const next = { ...cur };
+          for (const ex of workout.exercises) {
+            const p = map[ex.name];
+            if (!p) continue;
+            next[ex.id] = (next[ex.id] || []).map((r, i) =>
+              r.weight === '' && p[i]?.weight != null ? { ...r, weight: String(p[i]!.weight) } : r,
+            );
+          }
+          return next;
+        });
+      })
+      .catch(() => {});
+  }, [workout.id]);
+
   function setRow(exId: string, i: number, key: keyof Row, val: string | boolean) {
     setLogs((prev) => ({
       ...prev,
@@ -47,8 +77,16 @@ export function WorkoutPlayer({ workout, onBack }: { workout: Workout; onBack: (
   }
 
   function addSet(exId: string) {
-    setLogs((prev) => ({ ...prev, [exId]: [...prev[exId], { weight: '', reps: '', done: false }] }));
+    setLogs((cur) => ({ ...cur, [exId]: [...cur[exId], { weight: '', reps: '', done: false }] }));
   }
+
+  const pset = (name: string, i: number) => prev[name]?.[i];
+  const prevBest = (name: string) => {
+    const p = prev[name];
+    if (!p) return undefined;
+    const ws = p.filter((x) => x?.weight != null).map((x) => x!.weight as number);
+    return ws.length ? Math.max(...ws) : undefined;
+  };
 
   function finish() {
     const sets: {
@@ -144,6 +182,9 @@ export function WorkoutPlayer({ workout, onBack }: { workout: Workout; onBack: (
                   Alvo: {ex.sets}x{ex.reps}
                   {ex.weightKg ? ` · ${ex.weightKg}kg` : ''}
                 </Text>
+                {prevBest(ex.name) != null ? (
+                  <Text style={st.prevLine}>Última sessão: {prevBest(ex.name)}kg</Text>
+                ) : null}
 
                 <View style={st.head}>
                   <Text style={[st.h, { width: 34 }]}>Sér.</Text>
@@ -157,7 +198,7 @@ export function WorkoutPlayer({ workout, onBack }: { workout: Workout; onBack: (
                     <Text style={st.setNum}>{i + 1}</Text>
                     <View style={{ flex: 1 }}>
                       <Field
-                        placeholder="—"
+                        placeholder={pset(ex.name, i)?.weight != null ? String(pset(ex.name, i)!.weight) : '—'}
                         keyboardType="decimal-pad"
                         value={r.weight}
                         onChangeText={(t) => setRow(ex.id, i, 'weight', t)}
@@ -165,7 +206,7 @@ export function WorkoutPlayer({ workout, onBack }: { workout: Workout; onBack: (
                     </View>
                     <View style={{ flex: 1 }}>
                       <Field
-                        placeholder={ex.reps}
+                        placeholder={pset(ex.name, i)?.reps != null ? String(pset(ex.name, i)!.reps) : ex.reps}
                         keyboardType="numeric"
                         value={r.reps}
                         onChangeText={(t) => setRow(ex.id, i, 'reps', t)}
@@ -273,7 +314,8 @@ const st = StyleSheet.create({
   timerText: { color: COLORS.accent, fontWeight: '700', fontSize: 13 },
 
   exName: { color: COLORS.text, fontSize: 15, fontWeight: '700' },
-  exMeta: { color: COLORS.text2, fontSize: 12, marginTop: 3, marginBottom: 10 },
+  exMeta: { color: COLORS.text2, fontSize: 12, marginTop: 3 },
+  prevLine: { color: COLORS.accent, fontSize: 12, marginTop: 4, marginBottom: 10 },
 
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   h: { color: COLORS.text3, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },

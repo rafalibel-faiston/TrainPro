@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { api } from '../api';
-import type { Appointment, Payment, ProgressEntry, Workout } from '../types';
+import type { Appointment, Payment, ProgressEntry, Workout, WorkoutSession } from '../types';
 import {
   AppHeader,
   Badge,
@@ -13,7 +13,7 @@ import {
   Loading,
   Tabs,
 } from '../ui';
-import { COLORS, formatDate, formatDateTime, formatMoney, parseNum, paymentInfo } from '../theme';
+import { COLORS, formatDate, formatDateTime, formatDuration, formatMoney, parseNum, paymentInfo } from '../theme';
 
 interface FullStudent {
   id: string;
@@ -25,7 +25,7 @@ interface FullStudent {
   payments: Payment[];
 }
 
-type TabKey = 'treinos' | 'evolucao' | 'agenda' | 'pagamentos';
+type TabKey = 'treinos' | 'sessoes' | 'evolucao' | 'agenda' | 'pagamentos';
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -41,6 +41,7 @@ export function StudentDetail({
   onBack: () => void;
 }) {
   const [data, setData] = useState<FullStudent | null>(null);
+  const [sessions, setSessions] = useState<WorkoutSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<TabKey>('treinos');
   const [showForm, setShowForm] = useState(false);
@@ -49,8 +50,12 @@ export function StudentDetail({
 
   async function reload() {
     try {
-      const d = await api.get<FullStudent>(`/students/${studentId}`);
+      const [d, s] = await Promise.all([
+        api.get<FullStudent>(`/students/${studentId}`),
+        api.get<WorkoutSession[]>(`/workout-sessions?studentId=${studentId}`).catch(() => [] as WorkoutSession[]),
+      ]);
       setData(d);
+      setSessions(s);
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Erro ao carregar.');
     } finally {
@@ -91,6 +96,7 @@ export function StudentDetail({
         onChange={switchTab}
         items={[
           { key: 'treinos', label: 'Treinos' },
+          { key: 'sessoes', label: 'Sessões' },
           { key: 'evolucao', label: 'Evolução' },
           { key: 'agenda', label: 'Agenda' },
           { key: 'pagamentos', label: 'Mensalidades' },
@@ -103,14 +109,16 @@ export function StudentDetail({
         <Loading />
       ) : (
         <>
-          <View style={{ marginBottom: 14 }}>
-            <Button
-              title={showForm ? 'Cancelar' : addLabel(tab)}
-              icon={showForm ? 'x' : 'plus'}
-              variant={showForm ? 'ghost' : 'primary'}
-              onPress={() => setShowForm((v) => !v)}
-            />
-          </View>
+          {tab !== 'sessoes' && (
+            <View style={{ marginBottom: 14 }}>
+              <Button
+                title={showForm ? 'Cancelar' : addLabel(tab)}
+                icon={showForm ? 'x' : 'plus'}
+                variant={showForm ? 'ghost' : 'primary'}
+                onPress={() => setShowForm((v) => !v)}
+              />
+            </View>
+          )}
 
           {showForm && tab === 'treinos' && <WorkoutForm studentId={studentId} busy={busy} onSubmit={submit} />}
           {showForm && tab === 'evolucao' && <ProgressForm studentId={studentId} busy={busy} onSubmit={submit} />}
@@ -118,6 +126,7 @@ export function StudentDetail({
           {showForm && tab === 'pagamentos' && <PaymentForm studentId={studentId} busy={busy} onSubmit={submit} />}
 
           {tab === 'treinos' && <WorkoutList workouts={data?.workouts ?? []} />}
+          {tab === 'sessoes' && <SessionList sessions={sessions} />}
           {tab === 'evolucao' && <ProgressList entries={data?.progress ?? []} />}
           {tab === 'agenda' && <AppointmentList items={data?.appointments ?? []} />}
           {tab === 'pagamentos' && (
@@ -132,6 +141,7 @@ export function StudentDetail({
 function addLabel(tab: TabKey) {
   return {
     treinos: 'Novo treino',
+    sessoes: '',
     evolucao: 'Registrar evolução',
     agenda: 'Agendar sessão',
     pagamentos: 'Lançar mensalidade',
@@ -139,6 +149,45 @@ function addLabel(tab: TabKey) {
 }
 
 /* ─────────────────────────── Listas ─────────────────────────── */
+
+function SessionList({ sessions }: { sessions: WorkoutSession[] }) {
+  if (!sessions.length) {
+    return <EmptyState icon="bar-chart-2" text="O aluno ainda não registrou treinos." />;
+  }
+  return (
+    <>
+      {sessions.map((s) => {
+        // Maior carga por exercício na sessão.
+        const best = new Map<string, { w: number; reps?: number | null }>();
+        for (const set of s.sets) {
+          if (set.weightKg == null) continue;
+          const cur = best.get(set.exerciseName);
+          if (!cur || set.weightKg > cur.w) best.set(set.exerciseName, { w: set.weightKg, reps: set.reps });
+        }
+        return (
+          <Card key={s.id}>
+            <View style={st.rowBetween}>
+              <Text style={st.itemTitle}>{s.workout?.name ?? 'Treino'}</Text>
+              <Text style={st.metricInline}>{formatDuration(s.durationSec)}</Text>
+            </View>
+            <Text style={st.itemNote}>
+              {formatDate(s.startedAt)} · {s.sets.length} série(s)
+            </Text>
+            {best.size > 0 && (
+              <View style={st.chips}>
+                {Array.from(best.entries()).map(([name, b]) => (
+                  <Chip key={name}>
+                    {name}: {b.w}kg{b.reps ? `×${b.reps}` : ''}
+                  </Chip>
+                ))}
+              </View>
+            )}
+          </Card>
+        );
+      })}
+    </>
+  );
+}
 
 function WorkoutList({ workouts }: { workouts: Workout[] }) {
   if (!workouts.length) return <EmptyState icon="activity" text="Nenhum treino ainda." />;
