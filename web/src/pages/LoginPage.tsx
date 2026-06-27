@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../auth';
 import { ApiError } from '../api';
 import type { Role } from '../types';
+import { Button } from '@/components/ui/heroui-button';
 
 export function LoginPage() {
   const { login, register } = useAuth();
@@ -32,46 +33,75 @@ export function LoginPage() {
 
   return (
     <div className="auth-wrap">
-      <form className="card auth-card" onSubmit={submit}>
-        <h1 style={{ color: 'var(--accent)', marginTop: 0 }}>TrainPro</h1>
-        <p className="muted">
-          {mode === 'login' ? 'Entre na sua conta' : 'Crie sua conta'}
+      <form className="auth-card" onSubmit={submit}>
+        <div className="auth-logo">
+          <div className="auth-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+          </div>
+          <span className="auth-logo-text">TrainPro</span>
+        </div>
+
+        <h2 className="auth-heading">
+          {mode === 'login' ? 'Bem-vindo de volta' : 'Criar conta'}
+        </h2>
+        <p className="auth-sub">
+          {mode === 'login'
+            ? 'Entre na sua conta para continuar'
+            : 'Preencha os dados para começar'}
         </p>
 
         {mode === 'register' && (
           <>
-            <label>Nome</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} required />
-            <label>Eu sou</label>
-            <select value={role} onChange={(e) => setRole(e.target.value as Role)}>
-              <option value="TRAINER">Personal trainer</option>
-              <option value="STUDENT">Aluno</option>
-            </select>
+            <div className="auth-field">
+              <label>Nome completo</label>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Seu nome"
+                required
+              />
+            </div>
+            <div className="auth-field">
+              <label>Perfil</label>
+              <select value={role} onChange={(e) => setRole(e.target.value as Role)}>
+                <option value="TRAINER">Personal Trainer</option>
+                <option value="STUDENT">Aluno</option>
+              </select>
+            </div>
           </>
         )}
 
-        <label>E-mail</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <label>Senha</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="auth-field">
+          <label>E-mail</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
+            required
+          />
+        </div>
+
+        <div className="auth-field">
+          <label>Senha</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+          />
+        </div>
 
         {error && <p className="error">{error}</p>}
 
-        <button type="submit" disabled={busy} style={{ width: '100%' }}>
-          {busy ? 'Aguarde…' : mode === 'login' ? 'Entrar' : 'Cadastrar'}
-        </button>
+        <Button type="submit" variant="primary" size="lg" block disabled={busy} style={{ marginTop: 4 }}>
+          {busy ? 'Aguarde…' : mode === 'login' ? 'Entrar' : 'Criar conta'}
+        </Button>
 
-        <p className="muted" style={{ marginBottom: 0, marginTop: 12 }}>
+        <p className="auth-footer">
           {mode === 'login' ? 'Não tem conta? ' : 'Já tem conta? '}
           <a
             href="#"

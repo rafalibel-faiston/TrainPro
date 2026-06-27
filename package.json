@@ -2,18 +2,12 @@
   "name": "trainpro",
   "version": "0.1.0",
   "private": true,
-  "description": "TrainPro — plataforma para personal trainers gerenciarem seus alunos (treinos, evolução, agenda e pagamentos).",
-  "workspaces": [
-    "backend",
-    "web",
-    "mobile"
-  ],
+  "description": "TrainPro — deploy único no Railway: o backend serve a API e o build do app web.",
   "scripts": {
-    "dev:backend": "npm run dev --workspace backend",
-    "dev:web": "npm run dev --workspace web",
-    "dev": "npm run dev:backend & npm run dev:web",
-    "build": "npm run build --workspace web && npm run build --workspace backend",
-    "start": "npm run deploy --workspace backend"
-  },
-  "license": "MIT"
+    "build": "npm --prefix backend install --no-audit --no-fund && npm --prefix web install --no-audit --no-fund && npm --prefix backend run build && npm --prefix web run build",
+    "start": "npm --prefix backend run deploy",
+    "seed": "npm --prefix backend run seed",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:web": "npm --prefix web run dev"
+  }
 }

@@ -1,18 +1,6 @@
 node_modules/
 dist/
-build/
 .env
-*.log
-
-# Prisma local
-*.sqlite
-*.db
-
-# Editor / OS
-.DS_Store
-.vscode/
-.idea/
-
-# Expo
-.expo/
-web-build/
+.env.local
+__pycache__/
+*.pyc
