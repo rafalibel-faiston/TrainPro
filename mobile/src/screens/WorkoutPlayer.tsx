@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { api } from '../api';
 import type { Workout, WorkoutSession } from '../types';
@@ -13,6 +13,21 @@ interface Row {
 }
 
 type Mode = 'treinar' | 'evolucao';
+
+// Abre uma playlist de treino no Spotify (app instalado, ou navegador como fallback).
+async function openSpotify() {
+  const appUrl = 'spotify:playlist:37i9dQZF1DX76Wlfdnj7AP';
+  const webUrl = 'https://open.spotify.com/playlist/37i9dQZF1DX76Wlfdnj7AP';
+  try {
+    await Linking.openURL(appUrl);
+  } catch {
+    try {
+      await Linking.openURL(webUrl);
+    } catch {
+      Alert.alert('Spotify', 'Não foi possível abrir o Spotify.');
+    }
+  }
+}
 
 export function WorkoutPlayer({ workout, onBack }: { workout: Workout; onBack: () => void }) {
   const [mode, setMode] = useState<Mode>('treinar');
@@ -152,12 +167,17 @@ export function WorkoutPlayer({ workout, onBack }: { workout: Workout; onBack: (
         subtitle={mode === 'treinar' ? formatDuration(seconds) + ' em treino' : 'Evolução de cargas'}
         onBack={onBack}
         right={
-          mode === 'treinar' ? (
-            <View style={st.timer}>
-              <Feather name="clock" size={14} color={COLORS.accent} />
-              <Text style={st.timerText}>{formatDuration(seconds)}</Text>
-            </View>
-          ) : undefined
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <TouchableOpacity style={st.musicBtn} onPress={openSpotify} accessibilityLabel="Abrir Spotify">
+              <Feather name="music" size={16} color={COLORS.accent} />
+            </TouchableOpacity>
+            {mode === 'treinar' ? (
+              <View style={st.timer}>
+                <Feather name="clock" size={14} color={COLORS.accent} />
+                <Text style={st.timerText}>{formatDuration(seconds)}</Text>
+              </View>
+            ) : null}
+          </View>
         }
       />
 
@@ -312,6 +332,16 @@ function MiniBars({ values }: { values: number[] }) {
 const st = StyleSheet.create({
   timer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: COLORS.accentSoft, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
   timerText: { color: COLORS.accent, fontWeight: '700', fontSize: 13 },
+  musicBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
 
   exName: { color: COLORS.text, fontSize: 15, fontWeight: '700' },
   exMeta: { color: COLORS.text2, fontSize: 12, marginTop: 3 },
